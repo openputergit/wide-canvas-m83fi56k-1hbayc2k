@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open House Registry | Dream Home Realty</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-['Poppins']">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-3">
+                <div class="flex justify-between items-center">
+                    <div class="text-2xl font-bold text-blue-600">Dream Home Realty</div>
+                    <div class="flex space-x-4">
+                        <button onclick="switchMode('guest')" class="px-4 py-2 rounded-lg hover:bg-blue-50 transition">Guest</button>
+                        <button onclick="switchMode('registered')" class="px-4 py-2 rounded-lg hover:bg-blue-50 transition">Agent</button>
+                        <button onclick="switchMode('admin')" class="px-4 py-2 rounded-lg hover:bg-blue-50 transition">Admin</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Guest Form -->
+        <div id="guestMode" class="max-w-2xl mx-auto mt-10 px-4">
+            <h2 class="text-2xl font-semibold mb-6">Welcome to Our Open House!</h2>
+            <form id="visitorForm" class="space-y-6 bg-white p-6 rounded-lg shadow-md">
+                <div>
+                    <label class="block mb-2">Full Name</label>
+                    <input type="text" required class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-2">Email</label>
+                    <input type="email" required class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-2">Phone</label>
+                    <input type="tel" required class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-2">Current Status</label>
+                    <select class="w-full px-4 py-2 border rounded-lg">
+                        <option value="renting">Renting</option>
+                        <option value="owning">Own a Home</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2">Preferred Property Type</label>
+                    <select class="w-full px-4 py-2 border rounded-lg">
+                        <option value="single">Single Family Home</option>
+                        <option value="condo">Condominium</option>
+                        <option value="townhouse">Townhouse</option>
+                        <option value="multi">Multi-Family</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2">Purchase Timeline</label>
+                    <select class="w-full px-4 py-2 border rounded-lg">
+                        <option value="immediate">Immediate (0-3 months)</option>
+                        <option value="soon">Soon (3-6 months)</option>
+                        <option value="planning">Planning (6+ months)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2">Preferred Contact Method</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contact" value="phone" class="mr-2">
+                            Phone
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contact" value="email" class="mr-2">
+                            Email
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">Submit</button>
+            </form>
+        </div>
+
+        <!-- Registered User/Admin View -->
+        <div id="registeredMode" class="max-w-7xl mx-auto mt-10 px-4 hidden">
+            <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Name <span class="bi bi-chevron-up"></span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Email <span class="bi bi-chevron-up"></span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Phone <span class="bi bi-chevron-up"></span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Status <span class="bi bi-chevron-up"></span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Property Type <span class="bi bi-chevron-up"></span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Timeline <span class="bi bi-chevron-up"></span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="visitorTable">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'guest';
+        let visitors = [];
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('guestMode').style.display = mode === 'guest' ? 'block' : 'none';
+            document.getElementById('registeredMode').style.display = mode !== 'guest' ? 'block' : 'none';
+            
+            if (mode !== 'guest') {
+                renderTable();
+            }
+        }
+
+        document.getElementById('visitorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const visitor = {
+                name: e.target.elements[0].value,
+                email: e.target.elements[1].value,
+                phone: e.target.elements[2].value,
+                status: e.target.elements[3].value,
+                propertyType: e.target.elements[4].value,
+                timeline: e.target.elements[5].value,
+                contact: Array.from(formData.getAll('contact'))
+            };
+            visitors.push(visitor);
+            e.target.reset();
+            alert('Thank you for registering!');
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('visitorTable');
+            tbody.innerHTML = visitors.map(visitor => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">${visitor.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${visitor.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${visitor.phone}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${visitor.status}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${visitor.propertyType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${visitor.timeline}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Sorting functionality for admin
+        document.querySelectorAll('th').forEach((header, index) => {
+            header.addEventListener('click', () => {
+                if (currentMode === 'admin') {
+                    const chevron = header.querySelector('span');
+                    const isAscending = chevron.classList.contains('bi-chevron-up');
+                    
+                    // Reset all chevrons
+                    document.querySelectorAll('th span').forEach(span => {
+                        span.className = 'bi bi-chevron-up';
+                    });
+
+                    // Toggle current chevron
+                    chevron.className = `bi bi-chevron-${isAscending ? 'down' : 'up'}`;
+
+                    // Sort the visitors array
+                    const key = ['name', 'email', 'phone', 'status', 'propertyType', 'timeline'][index];
+                    visitors.sort((a, b) => {
+                        return isAscending 
+                            ? a[key].localeCompare(b[key])
+                            : b[key].localeCompare(a[key]);
+                    });
+
+                    renderTable();
+                }
+            });
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
